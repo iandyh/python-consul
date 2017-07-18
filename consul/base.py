@@ -150,6 +150,7 @@ Response = collections.namedtuple('Response', ['code', 'headers', 'body'])
 # Conveniences to create consistent callback handlers for endpoints
 
 class CB(object):
+
     @classmethod
     def __status(klass, response, allow_404=True):
         # status checking
@@ -223,6 +224,7 @@ class CB(object):
 
 
 class Consul(object):
+
     def __init__(
             self,
             host='127.0.0.1',
@@ -272,6 +274,7 @@ class Consul(object):
 
         self.event = Consul.Event(self)
         self.kv = Consul.KV(self)
+        self.txn = Consul.TXN(self)
         self.agent = Consul.Agent(self)
         self.catalog = Consul.Catalog(self)
         self.health = Consul.Health(self)
@@ -296,6 +299,7 @@ class Consul(object):
         practice, this means you cannot rely on the order of message delivery.
         An advantage however is that events can still be used even in the
         absence of server nodes or during an outage."""
+
         def __init__(self, agent):
             self.agent = agent
 
@@ -403,6 +407,7 @@ class Consul(object):
         used to store service configurations or other meta data in a simple
         way.
         """
+
         def __init__(self, agent):
             self.agent = agent
 
@@ -595,6 +600,14 @@ class Consul(object):
             return self.agent.http.delete(
                 CB.json(), '/v1/kv/%s' % key, params=params)
 
+    class TXN(object):
+
+        def __init__(self, agent):
+            self.agent = agent
+
+        def put(self, value):
+            return self.agent.http.put_json(CB.json(), "/v1/txn", value)
+
     class Agent(object):
         """
         The Agent endpoints are used to interact with a local Consul agent.
@@ -602,6 +615,7 @@ class Consul(object):
         takes on the burden of registering with the Catalog and performing
         anti-entropy to recover from outages.
         """
+
         def __init__(self, agent):
             self.agent = agent
             self.service = Consul.Agent.Service(agent)
@@ -712,6 +726,7 @@ class Consul(object):
                 CB.bool(), '/v1/agent/force-leave/%s' % node)
 
         class Service(object):
+
             def __init__(self, agent):
                 self.agent = agent
 
@@ -837,6 +852,7 @@ class Consul(object):
                     params=params)
 
         class Check(object):
+
             def __init__(self, agent):
                 self.agent = agent
 
@@ -969,6 +985,7 @@ class Consul(object):
                     params=params)
 
     class Catalog(object):
+
         def __init__(self, agent):
             self.agent = agent
 
@@ -1355,6 +1372,7 @@ class Consul(object):
 
     class Health(object):
         # TODO: All of the health endpoints support all consistency modes
+
         def __init__(self, agent):
             self.agent = agent
 
@@ -1552,6 +1570,7 @@ class Consul(object):
                 params=params)
 
     class Session(object):
+
         def __init__(self, agent):
             self.agent = agent
 
@@ -1777,6 +1796,7 @@ class Consul(object):
                 params=params)
 
     class ACL(object):
+
         def __init__(self, agent):
             self.agent = agent
 
@@ -1958,6 +1978,7 @@ class Consul(object):
         The Status endpoints are used to get information about the status
          of the Consul cluster.
         """
+
         def __init__(self, agent):
             self.agent = agent
 
@@ -1976,6 +1997,7 @@ class Consul(object):
             return self.agent.http.get(CB.json(), '/v1/status/peers')
 
     class Query(object):
+
         def __init__(self, agent):
             self.agent = agent
 
@@ -2232,6 +2254,7 @@ class Consul(object):
                 CB.json(), '/v1/query/%s/explain' % query, params=params)
 
     class Coordinate(object):
+
         def __init__(self, agent):
             self.agent = agent
 
@@ -2272,6 +2295,7 @@ class Consul(object):
                 CB.json(index=True), '/v1/coordinate/nodes', params=params)
 
     class Operator(object):
+
         def __init__(self, agent):
             self.agent = agent
 
